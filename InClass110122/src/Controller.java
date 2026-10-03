@@ -31,7 +31,7 @@ public class Controller {
     {
         public ResetController()
         {
-            studentView.addSaveListener(this);
+            studentView.addResetListener(this);
         }
 
         @Override
