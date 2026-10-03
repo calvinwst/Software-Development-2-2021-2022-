@@ -11,6 +11,7 @@ public class TempConvert extends JFrame implements ActionListener, WindowListene
     private Container contentPane = this.getContentPane();
 
     private JLabel cLabel = new JLabel("C:"), fLabel = new JLabel("F:");
+    private JLabel statusLabel = new JLabel(" ");
 
     private JTextField cArea = new JTextField(10), fArea = new JTextField(10);
 
@@ -18,7 +19,7 @@ public class TempConvert extends JFrame implements ActionListener, WindowListene
 
     public TempConvert()
     {
-        this.setSize(400,100);
+        this.setSize(400,120);
         this.setResizable(false);
 
         this.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -59,6 +60,12 @@ public class TempConvert extends JFrame implements ActionListener, WindowListene
 
         contentPane.add(fArea, gbc);
 
+        gbc.gridx = 1;
+        gbc.gridy = 3;
+        gbc.gridwidth = 2;
+        statusLabel.setForeground(new Color(170, 0, 0));
+        contentPane.add(statusLabel, gbc);
+
         cArea.addActionListener(this);
 
         fArea.addActionListener(this);
@@ -70,28 +77,39 @@ public class TempConvert extends JFrame implements ActionListener, WindowListene
     {
         if (c == 'C')
         {
-            return Math.round(((d*1.8)+32)*100)/100;
+            return Math.round(((d*1.8)+32)*100)/100.0;
         }
         else
         {
-            return Math.round(((d-32)/1.8)*100)/100;
+            return Math.round(((d-32)/1.8)*100)/100.0;
         }
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == cArea)
-        {
-            cValue = Double.parseDouble(cArea.getText());
-            fValue = convertTemp(cValue, 'C');
-        }
-        else{
-            fValue = Double.parseDouble(fArea.getText());
-            cValue = convertTemp(fValue, 'F');
-        }
+        JTextField inputField = e.getSource() == cArea ? cArea : fArea;
+        try {
+            double input = Double.parseDouble(inputField.getText().trim());
+            if (!Double.isFinite(input)) {
+                throw new NumberFormatException();
+            }
 
-        cArea.setText(""+cValue);
-        fArea.setText(""+fValue);
+            if (inputField == cArea) {
+                cValue = input;
+                fValue = convertTemp(cValue, 'C');
+            } else {
+                fValue = input;
+                cValue = convertTemp(fValue, 'F');
+            }
+
+            statusLabel.setText(" ");
+            cArea.setText("" + cValue);
+            fArea.setText("" + fValue);
+        } catch (NumberFormatException ex) {
+            statusLabel.setText("Enter a valid finite number.");
+            inputField.selectAll();
+            inputField.requestFocusInWindow();
+        }
 
     }
 
